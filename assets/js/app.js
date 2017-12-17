@@ -238,7 +238,6 @@ $('#msg').on('keydown', e => {
   const me = $('meta[name=id]').attr('content')
 
   message = $.sanitize(message)
-  console.log(message)
 
   if (e.keyCode == 13 && message.trim().length) {
     $('.messages-'+code).prepend(`

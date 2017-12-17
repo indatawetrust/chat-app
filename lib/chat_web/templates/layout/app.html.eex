@@ -12,11 +12,11 @@
   </head>
   <body>
     <div class="">
-      <div style="position: fixed;z-index: 999;width: 100%;background-color: #fff;top: 0;">
+      <div style="position:fixed;z-index: 999;width: 100%;background-color: #fff;top: 0;">
         <div class="" style="padding:5px;font-size:20px">
           Talktotalk<sup style="font-size:12px"> beta</sup>
         </div>
-        <div style="width:100%;overflow-y:scroll;height:69px">
+        <div style="width:100%;overflow-y:scroll;height:69px;margin-top:-20px">
           <ul class="nav nav-tabs userTabs">
             <li class="active usersTab"><a data-toggle="tab" href="#home">users</a></li>
           </ul>
@@ -25,7 +25,7 @@
           <input type="text" class="form-control" id="msg" placeholder="message.." autofocus disabled>
         </div>
       </div>
-      <div class="tab-content" style="margin-top: 152px;margin-bottom:60px">
+      <div class="tab-content" style="margin-top: 136px;margin-bottom:60px">
         <div id="home" class="tab-pane fade in active">
           <button type="button" class="btn btn-default btn-block shuffle" style="margin-bottom:5px">shuffle</button>
           <ul class="list-group usersUl">
@@ -38,7 +38,7 @@
         </div>
       </div>
     </div>
-    <div style="position:fixed;bottom:0;background-color:#fff;width:100%;text-align:center;padding:20px">
+    <div style="position:fixed;bottom:0;background-color:#fff;width:100%;text-align:center;padding:5px">
       🦄
     </div>
     <!-- Global site tag (gtag.js) - Google Analytics -->
