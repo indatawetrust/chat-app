@@ -1,16 +1,20 @@
 import "phoenix_html"
-const {Howl} = require('howler')
+const {Howl} = require('howler');
+import {Socket} from "phoenix"
 
-var sound = new Howl({
+(function($) {
+	$.sanitize = function(input) {
+		var output = input.replace(/<script[^>]*?>.*?<\/script>/gi, '').
+					 replace(/<[\/\!]*?[^<>]*?>/gi, '').
+					 replace(/<style[^>]*?>.*?<\/style>/gi, '').
+					 replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
+	    return output;
+	};
+})(jQuery);
+
+const sound = new Howl({
   src: ['sound/notification.mp3']
 });
-
-// Import local files
-//
-// Local files can be imported directly using relative
-// paths "./socket" or full ones "web/static/js/socket".
-
-import {Socket} from "phoenix"
 
 $('#msg').attr('disabled', 'disabled')
 $('#msg').val('')
@@ -24,6 +28,18 @@ let channel = socket.channel("room:" + $('meta[name=id]').attr('content'), {})
 setInterval(() => {
   $('.time').each((i, el) => $(el).text(moment($(el).attr('date')).fromNow()))
 }, 1000)
+
+const tabWidthUpdate = () => {
+  let total = 0
+
+  $('.userTabs li').each((i, el) => total+=$(el).width())
+
+  total += 30
+
+  $('.userTabs').css({
+    width: total+'px'
+  })
+}
 
 channel.join()
   .receive("ok", resp => {
@@ -71,8 +87,10 @@ const tabClick = () => {
 channel.on("new_msg", payload => {
 
   const code = payload.user
-  const message = payload.body
+  let message = payload.body
   let active = $('.nav-tabs .active').attr('code')
+
+  message = $.sanitize(message)
 
   $('#roomMenu-'+code).attr('sp', 0)
 
@@ -100,9 +118,13 @@ channel.on("new_msg", payload => {
       $('.usersTab').tab('show')
       $('#home').addClass('active in')
       $('#msg').attr('disabled', 'disabled')
+
+      tabWidthUpdate()
     })
 
     tabClick()
+
+    tabWidthUpdate()
   } else {
     if (code != active) {
       let num = parseInt($('#notify-'+code).text().replace(/[()]/g, ''))
@@ -173,6 +195,8 @@ const userLi = e => {
         if (tracker)
           tracker.send('event', 'closeUserTab', code);
       }
+
+      tabWidthUpdate()
     })
 
     $('#roomMenu-'+code).tab('show')
@@ -181,6 +205,8 @@ const userLi = e => {
   }
 
   tabClick()
+
+  tabWidthUpdate()
 
   $('#msg').removeAttr('disabled')
   $('#msg').focus()
@@ -198,16 +224,21 @@ $('.userLi').on('click', userLi)
 
 $('#msg').on('keyup', e => {
   const code = $('.nav-tabs li.active').attr('id').split('-').pop()
-  const message = encodeURIComponent($(e.target).val())
+  let message = $(e.target).val()
   const active = $('.nav-tabs .active').attr('code')
+
+  message = $.sanitize(message)
 
   $('#roomMenu-'+code).attr('input-text', message)
 })
 
 $('#msg').on('keydown', e => {
   const code = $('.nav-tabs li.active').attr('id').split('-').pop()
-  const message = encodeURIComponent($(e.target).val())
+  let message = $(e.target).val()
   const me = $('meta[name=id]').attr('content')
+
+  message = $.sanitize(message)
+  console.log(message)
 
   if (e.keyCode == 13 && message.trim().length) {
     $('.messages-'+code).prepend(`

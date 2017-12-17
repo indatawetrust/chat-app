@@ -16,9 +16,11 @@
         <div class="" style="padding:5px;font-size:20px">
           Talktotalk<sup style="font-size:12px"> beta</sup>
         </div>
-        <ul class="nav nav-tabs">
-          <li class="active usersTab"><a data-toggle="tab" href="#home">users</a></li>
-        </ul>
+        <div style="width:100%;overflow-y:scroll;height:69px">
+          <ul class="nav nav-tabs userTabs">
+            <li class="active usersTab"><a data-toggle="tab" href="#home">users</a></li>
+          </ul>
+        </div>
         <div class="form-group">
           <input type="text" class="form-control" id="msg" placeholder="message.." autofocus disabled>
         </div>
