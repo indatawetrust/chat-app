@@ -25,7 +25,7 @@ defmodule ChatWeb.PageController do
 
     result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' order by random() limit 20" , [])
 
-    {:ok, redisConnect} = Redix.start_link()
+    {:ok, redisConnect} = Redix.start_link(password: 'password')
 
     users = []
 
@@ -59,7 +59,7 @@ defmodule ChatWeb.PageController do
 
     result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' order by random() limit 20" , [])
 
-    {:ok, redisConnect} = Redix.start_link()
+    {:ok, redisConnect} = Redix.start_link(password: 'password')
 
     users = []
 

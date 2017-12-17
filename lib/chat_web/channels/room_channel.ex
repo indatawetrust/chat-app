@@ -11,7 +11,7 @@ defmodule ChatWeb.RoomChannel do
   end
 
   def handle_in("heartbeat", %{"me" => me}, socket) do
-    {:ok, connect} = Redix.start_link()
+    {:ok, connect} = Redix.start_link(password: 'password')
 
     Redix.command(connect, ["SET", "heartbeat-"<>me, :os.system_time(:millisecond)])
 
