@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="id" content="<%= @id %>">
+    <title>Talktotalk.me</title>
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+  </head>
+  <body>
+    <div class="">
+      <div style="position: fixed;z-index: 999;width: 100%;background-color: #fff;top: 0;">
+        <div class="" style="padding:5px;font-size:20px">
+          Talktotalk<sup style="font-size:12px"> beta</sup>
+        </div>
+        <ul class="nav nav-tabs">
+          <li class="active usersTab"><a data-toggle="tab" href="#home">users</a></li>
+        </ul>
+        <div class="form-group">
+          <input type="text" class="form-control" id="msg" placeholder="message.." autofocus disabled>
+        </div>
+      </div>
+      <div class="tab-content" style="margin-top: 152px;margin-bottom:60px">
+        <div id="home" class="tab-pane fade in active">
+          <button type="button" class="btn btn-default btn-block shuffle" style="margin-bottom:5px">shuffle</button>
+          <ul class="list-group usersUl">
+            <%= for user <- @users do %>
+              <li class="list-group-item userLi" code="<%= user[:code] %>" style="cursor:pointer">
+                <img code="<%= user[:code] %>" src="https://www.ocf.berkeley.edu/~dblab/blog/wp-content/uploads/2012/01/icon-profile.png" class="userPic img-circle" style="width:30px;height:auto"> <%= user[:code] %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="position:fixed;bottom:0;background-color:#fff;width:100%;text-align:center;padding:20px">
+      🦄
+    </div>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111278853-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111278853-1');
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.4/moment.min.js"></script>
+    <script src="https://unpkg.com/tahta@1.0.2/index.js"></script>
+    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+  </body>
+</html>
