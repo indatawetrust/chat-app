@@ -34,7 +34,7 @@ const tabWidthUpdate = () => {
 
   $('.userTabs li').each((i, el) => total+=$(el).width())
 
-  total += 30
+  total += 60
 
   $('.userTabs').css({
     width: total+'px'
@@ -46,7 +46,7 @@ channel.join()
 
     setInterval(() => {
       channel.push("heartbeat", {me: $('meta[name=id]').attr('content')})
-    }, 1000)
+    }, 3000)
 
   })
 
@@ -124,7 +124,6 @@ channel.on("new_msg", payload => {
 
     tabClick()
 
-    tabWidthUpdate()
   } else {
     if (code != active) {
       let num = parseInt($('#notify-'+code).text().replace(/[()]/g, ''))
@@ -154,6 +153,8 @@ channel.on("new_msg", payload => {
       </div>
     </li>
   `)
+
+  tabWidthUpdate()
 
 })
 

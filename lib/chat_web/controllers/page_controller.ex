@@ -36,7 +36,7 @@ defmodule ChatWeb.PageController do
 
           {:ok, heartbeatTime} = Redix.command(redisConnect, ["GET", "heartbeat-"<>code])
 
-          if heartbeatTime && (String.to_integer(heartbeatTime) + 2000 > :os.system_time(:millisecond)) do
+          if heartbeatTime && (String.to_integer(heartbeatTime) + 5000 > :os.system_time(:millisecond)) do
             users = users ++ [code: code]
           else
             # user = Repo.get_by(User, code: code)
@@ -70,7 +70,7 @@ defmodule ChatWeb.PageController do
 
           {:ok, heartbeatTime} = Redix.command(redisConnect, ["GET", "heartbeat-"<>code])
 
-          if heartbeatTime && (String.to_integer(heartbeatTime) + 2000 > :os.system_time(:millisecond)) do
+          if heartbeatTime && (String.to_integer(heartbeatTime) + 5000 > :os.system_time(:millisecond)) do
             users = users ++ %{"code"=> code}
           else
             # user = Repo.get_by(User, code: code)
