@@ -23,7 +23,7 @@ defmodule ChatWeb.PageController do
       %User{ code: sessionId } |> Repo.insert
     end
 
-    result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' order by random() limit 20" , [])
+    result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' order by random() limit 10" , [])
 
     {:ok, redisConnect} = Redix.start_link(password: 'password')
 
@@ -35,8 +35,8 @@ defmodule ChatWeb.PageController do
           code = Enum.at(item, 1)
 
           {:ok, heartbeatTime} = Redix.command(redisConnect, ["GET", "heartbeat-"<>code])
-
-          if heartbeatTime && (String.to_integer(heartbeatTime) + 5000 > :os.system_time(:millisecond)) do
+          
+          if heartbeatTime && (String.to_integer(heartbeatTime) + 25000 > :os.system_time(:millisecond)) do
             users = users ++ [code: code]
           else
             # user = Repo.get_by(User, code: code)
@@ -57,7 +57,7 @@ defmodule ChatWeb.PageController do
   def users(conn, _params) do
     sessionId = get_session(conn, :message)
 
-    result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' order by random() limit 20" , [])
+    result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' order by random() limit 10" , [])
 
     {:ok, redisConnect} = Redix.start_link(password: 'password')
 
@@ -70,12 +70,12 @@ defmodule ChatWeb.PageController do
 
           {:ok, heartbeatTime} = Redix.command(redisConnect, ["GET", "heartbeat-"<>code])
 
-          if heartbeatTime && (String.to_integer(heartbeatTime) + 5000 > :os.system_time(:millisecond)) do
+           if heartbeatTime && (String.to_integer(heartbeatTime) + 25000 > :os.system_time(:millisecond)) do
             users = users ++ %{"code"=> code}
-          else
+           else
             # user = Repo.get_by(User, code: code)
             # Repo.delete(user)
-          end
+           end
 
         end
       _ -> IO.puts("error")

@@ -15,7 +15,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :chat, ChatWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "example.com", port: 80],
+  url: [host: "talktotalk.me", port: 443],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
@@ -26,13 +26,14 @@ config :logger, level: :info
 # To get SSL working, you will need to add the `https` key
 # to the previous section and set your `:url` port to 443:
 #
-#     config :chat, ChatWeb.Endpoint,
-#       ...
-#       url: [host: "example.com", port: 443],
-#       https: [:inet6,
-#               port: 443,
-#               keyfile: System.get_env("SOME_APP_SSL_KEY_PATH"),
-#               certfile: System.get_env("SOME_APP_SSL_CERT_PATH")]
+config :chat, ChatWeb.Endpoint,
+ http: [port: 80],
+ force_ssl: [hsts: true],
+ https: [port: 443,
+ otp_app: :chat,
+ keyfile: "/etc/letsencrypt/live/talktotalk.me/privkey.pem",
+ cacertfile: "/etc/letsencrypt/live/talktotalk.me/chain.pem",  
+ certfile: "/etc/letsencrypt/live/talktotalk.me/cert.pem"]
 #
 # Where those two env variables return an absolute path to
 # the key and cert in disk or a relative path inside priv,
@@ -61,4 +62,5 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
+
 import_config "prod.secret.exs"
