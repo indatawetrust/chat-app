@@ -23,9 +23,7 @@ defmodule ChatWeb.PageController do
       %User{ code: sessionId } |> Repo.insert
     end
 
-    result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' order by random() limit 10" , [])
-
-    {:ok, redisConnect} = Redix.start_link(password: 'password')
+    result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' and updated_at > (CURRENT_TIMESTAMP - INTERVAL '2 hour' - INTERVAL '5 second') order by random() limit 10" , [])
 
     users = []
 
@@ -34,20 +32,10 @@ defmodule ChatWeb.PageController do
         users = for item <- columns.rows do
           code = Enum.at(item, 1)
 
-          {:ok, heartbeatTime} = Redix.command(redisConnect, ["GET", "heartbeat-"<>code])
-          
-          if heartbeatTime && (String.to_integer(heartbeatTime) + 25000 > :os.system_time(:millisecond)) do
-            users = users ++ [code: code]
-          else
-            # user = Repo.get_by(User, code: code)
-            # Repo.delete(user)
-          end
-
+          users = users ++ [code: code]
         end
       _ -> IO.puts("error")
     end
-
-    Redix.stop(redisConnect)
 
     users = Enum.filter(users, fn(user) -> user end)
 
@@ -57,9 +45,7 @@ defmodule ChatWeb.PageController do
   def users(conn, _params) do
     sessionId = get_session(conn, :message)
 
-    result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' order by random() limit 10" , [])
-
-    {:ok, redisConnect} = Redix.start_link(password: 'password')
+    result = SQL.query(Repo, "select * from users where code != '" <> sessionId <> "' and updated_at > (CURRENT_TIMESTAMP - INTERVAL '2 hour' - INTERVAL '5 second') order by random() limit 10" , [])
 
     users = []
 
@@ -68,20 +54,10 @@ defmodule ChatWeb.PageController do
         users = for item <- columns.rows do
           code = Enum.at(item, 1)
 
-          {:ok, heartbeatTime} = Redix.command(redisConnect, ["GET", "heartbeat-"<>code])
-
-           if heartbeatTime && (String.to_integer(heartbeatTime) + 25000 > :os.system_time(:millisecond)) do
-            users = users ++ %{"code"=> code}
-           else
-            # user = Repo.get_by(User, code: code)
-            # Repo.delete(user)
-           end
-
+          users = users ++ %{"code"=> code}
         end
       _ -> IO.puts("error")
     end
-
-    Redix.stop(redisConnect)
 
     users = Enum.filter(users, fn(user) -> user end)
 

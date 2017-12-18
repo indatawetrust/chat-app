@@ -45,7 +45,9 @@ channel.join()
   .receive("ok", resp => {
 
     setInterval(() => {
-      channel.push("heartbeat", {me: $('meta[name=id]').attr('content')})
+      const code = $('meta[name=id]').attr('content')
+
+      channel.push("heartbeat", {code: code})
     }, 3000)
 
   })
@@ -90,71 +92,73 @@ channel.on("new_msg", payload => {
   let message = payload.body
   let active = $('.nav-tabs .active').attr('code')
 
-  message = $.sanitize(message)
+  if (payload.type == 'message') {
+    message = $.sanitize(message)
 
-  $('#roomMenu-'+code).attr('sp', 0)
+    $('#roomMenu-'+code).attr('sp', 0)
 
-  if (active != code) {
-    sound.play();
-  } else {
-    $(window).scrollTop(0)
-  }
-
-  if (!$('#menu-'+code).length) {
-    const tabDiv = '<div id="menu-'+code+'" class="tab-pane fade">'+
-                    '<ul class="list-group messages-'+code+'">'+
-                    // '  <li class="list-group-item userLi">...</li>'+
-                    '</ul>'
-                    '</div>'
-
-    const tabMenu = '<li code="'+code+'" id="roomMenu-'+code+'" room="1"><a code="'+code+'" data-toggle="tab" href="#menu-'+code+'">'+code+' <span id="notify-'+code+'" style="font-weight:bold">(1)</span> <button id="closeRoom-'+code+'" style="border-radius:50%">x</button></a></li>'
-
-    $('.nav-tabs').append(tabMenu)
-    $('.tab-content').append(tabDiv)
-
-    $('#closeRoom-'+code).on('click', e => {
-      $('#roomMenu-'+code).remove()
-      $('#menu-'+code).remove()
-      $('.usersTab').tab('show')
-      $('#home').addClass('active in')
-      $('#msg').attr('disabled', 'disabled')
-
-      tabWidthUpdate()
-    })
-
-    tabClick()
-
-  } else {
-    if (code != active) {
-      let num = parseInt($('#notify-'+code).text().replace(/[()]/g, ''))
-
-      num = num ? num : 0
-
-      $('#notify-'+code).text('('+(++num)+')')
+    if (active != code) {
+      sound.play();
+    } else {
+      $(window).scrollTop(0)
     }
+
+    if (!$('#menu-'+code).length) {
+      const tabDiv = '<div id="menu-'+code+'" class="tab-pane fade">'+
+                      '<ul class="list-group messages-'+code+'">'+
+                      // '  <li class="list-group-item userLi">...</li>'+
+                      '</ul>'
+                      '</div>'
+
+      const tabMenu = '<li code="'+code+'" id="roomMenu-'+code+'" room="1"><a code="'+code+'" data-toggle="tab" href="#menu-'+code+'">'+code+' <span id="notify-'+code+'" style="font-weight:bold">(1)</span> <button id="closeRoom-'+code+'" style="border-radius:50%">x</button></a></li>'
+
+      $('.nav-tabs').append(tabMenu)
+      $('.tab-content').append(tabDiv)
+
+      $('#closeRoom-'+code).on('click', e => {
+        $('#roomMenu-'+code).remove()
+        $('#menu-'+code).remove()
+        $('.usersTab').tab('show')
+        $('#home').addClass('active in')
+        $('#msg').attr('disabled', 'disabled')
+
+        tabWidthUpdate()
+      })
+
+      tabClick()
+
+    } else {
+      if (code != active) {
+        let num = parseInt($('#notify-'+code).text().replace(/[()]/g, ''))
+
+        num = num ? num : 0
+
+        $('#notify-'+code).text('('+(++num)+')')
+      }
+    }
+
+    const me = $('meta[name=id]').attr('content')
+
+    $('.messages-'+code).prepend(`
+      <li class="list-group-item" style="background-color:#fff">
+        <div class="row" style="padding:4px">
+          <div style="float:left;">
+            <img code="<%= user.code %>" src="https://www.ocf.berkeley.edu/~dblab/blog/wp-content/uploads/2012/01/icon-profile.png" class="userPic img-circle" style="width:30px">
+          </div>
+          <div style="float:left;width:90%">
+            <div style="padding:0 4px 4px 4px">
+              ${decodeURIComponent(message)}
+            </div>
+            <div style="font-size:11px" class="time" date="${Date()}">
+              ${moment().fromNow()}
+            </div>
+          </div>
+        </div>
+      </li>
+    `)
+
+    tabWidthUpdate()
   }
-
-  const me = $('meta[name=id]').attr('content')
-
-  $('.messages-'+code).prepend(`
-    <li class="list-group-item" style="background-color:#fff">
-      <div class="row" style="padding:4px">
-        <div style="float:left;">
-          <img code="<%= user.code %>" src="https://www.ocf.berkeley.edu/~dblab/blog/wp-content/uploads/2012/01/icon-profile.png" class="userPic img-circle" style="width:30px">
-        </div>
-        <div style="float:left;width:90%">
-          <div style="padding:0 4px 4px 4px">
-            ${decodeURIComponent(message)}
-          </div>
-          <div style="font-size:11px" class="time" date="${Date()}">
-            ${moment().fromNow()}
-          </div>
-        </div>
-      </div>
-    </li>
-  `)
-
-  tabWidthUpdate()
 
 })
 
@@ -259,7 +263,7 @@ $('#msg').on('keydown', e => {
       </li>
     `)
 
-    channel.push("new_msg", {id: code, me: $('meta[name=id]').attr('content'), msg: message})
+    channel.push("new_msg", {id: code, me: $('meta[name=id]').attr('content'), msg: message, type: 'message'})
 
     $(e.target).val('')
   }
