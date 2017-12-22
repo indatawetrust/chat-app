@@ -1,6 +1,8 @@
 import "phoenix_html"
+import "autolink-js"
 const {Howl} = require('howler');
 import {Socket} from "phoenix"
+import cacheDB from "./database"
 
 (function($) {
 	$.sanitize = function(input) {
@@ -63,7 +65,11 @@ const tabClick = () => {
 
       $('#notify-'+code).text('')
 
-      $('#msg').val($('#roomMenu-'+code).attr('input-text'))
+      if (cacheDB.getRoomInput(code).text.length) {
+        $('#msg').val(cacheDB.getRoomInput(code).text)
+      } else {
+        $('#msg').val($('#roomMenu-'+code).attr('input-text'))
+      }
 
       $('#msg').focus()
 
@@ -73,21 +79,27 @@ const tabClick = () => {
           clearInterval(interval)
         }
       }, 1)
+
+      // notify reset
+      cacheDB.setRoomNotify(code, 0)
     } else {
       $('#msg').attr('disabled', 'disabled')
       $('#msg').val('')
     }
   });
 
-  if ("ga" in window) {
-    var tracker = ga.getAll()[0];
-    if (tracker)
-      tracker.send('event', 'tabClick', $('meta[name=id]').attr('content'));
+  try {
+    if ("ga" in window) {
+      var tracker = ga.getAll()[0];
+      if (tracker)
+        tracker.send('event', 'tabClick', $('meta[name=id]').attr('content'));
+    }
+  } catch (e) {
+
   }
 }
 
 channel.on("new_msg", payload => {
-
   const code = payload.user
   let message = payload.body
   let active = $('.nav-tabs .active').attr('code')
@@ -123,17 +135,30 @@ channel.on("new_msg", payload => {
         $('#msg').attr('disabled', 'disabled')
 
         tabWidthUpdate()
+
+        cacheDB.removeRoom(code)
       })
 
       tabClick()
 
+      cacheDB.createRoom(code)
+
     } else {
       if (code != active) {
-        let num = parseInt($('#notify-'+code).text().replace(/[()]/g, ''))
+        const text = $('#notify-'+code).text().replace(/[() \+]/g, '')
+
+        let num = parseInt(text.length ? text : 0)
 
         num = num ? num : 0
 
-        $('#notify-'+code).text('('+(++num)+')')
+        if (num >= 10) {
+          $('#notify-'+code).text(num ? ('(10+)') : '')
+          ++num
+        } else {
+          $('#notify-'+code).text('('+(++num)+')')
+        }
+
+        cacheDB.setRoomNotify(code, num)
       }
     }
 
@@ -147,7 +172,7 @@ channel.on("new_msg", payload => {
           </div>
           <div style="float:left;width:90%">
             <div style="padding:0 4px 4px 4px">
-              ${decodeURIComponent(message)}
+              ${decodeURIComponent(message.autoLink({ target: "_blank", rel: "nofollow" }))}
             </div>
             <div style="font-size:11px" class="time" date="${Date()}">
               ${moment().fromNow()}
@@ -156,6 +181,14 @@ channel.on("new_msg", payload => {
         </div>
       </li>
     `)
+
+    cacheDB.createMessage({
+      room: code,
+      user: code,
+      time: new Date(),
+      body: message,
+      type: "message"
+    })
 
     tabWidthUpdate()
   }
@@ -202,6 +235,8 @@ const userLi = e => {
       }
 
       tabWidthUpdate()
+
+      cacheDB.removeRoom(code)
     })
 
     $('#roomMenu-'+code).tab('show')
@@ -211,12 +246,18 @@ const userLi = e => {
 
   tabClick()
 
+  cacheDB.createRoom(code)
+
   tabWidthUpdate()
 
   $('#msg').removeAttr('disabled')
   $('#msg').focus()
 
-  $('#msg').val($('#roomMenu-'+code).attr('input-text'))
+  if (cacheDB.getRoomInput(code).text.length) {
+    $('#msg').val(cacheDB.getRoomInput(code).text)
+  } else {
+    $('#msg').val($('#roomMenu-'+code).attr('input-text'))
+  }
 
   $('#notify-'+code).text('')
 
@@ -235,6 +276,8 @@ $('#msg').on('keyup', e => {
   message = $.sanitize(message)
 
   $('#roomMenu-'+code).attr('input-text', message)
+
+  cacheDB.setRoomInput(code, message);
 })
 
 $('#msg').on('keydown', e => {
@@ -253,7 +296,7 @@ $('#msg').on('keydown', e => {
           </div>
           <div style="float:left;width:90%">
             <div style="padding:0 4px 4px 4px">
-              ${decodeURIComponent(message)}
+              ${decodeURIComponent(message.autoLink({ target: "_blank", rel: "nofollow" }))}
             </div>
             <div style="font-size:11px" class="time" date="${Date()}">
               ${moment().fromNow()}
@@ -264,6 +307,14 @@ $('#msg').on('keydown', e => {
     `)
 
     channel.push("new_msg", {id: code, me: $('meta[name=id]').attr('content'), msg: message, type: 'message'})
+
+    cacheDB.createMessage({
+      room: code,
+      user: $('meta[name=id]').attr('content'),
+      time: new Date(),
+      body: message,
+      type: "message"
+    })
 
     $(e.target).val('')
   }
@@ -291,7 +342,7 @@ $('.shuffle').click(() => {
         tracker.send('event', 'shuffleClick', $('meta[name=id]').attr('content'));
     }
   })
-})
+});
 
 $(window).scroll(e => {
   const code = $('.nav-tabs .active').attr('code')
@@ -299,4 +350,16 @@ $(window).scroll(e => {
   if (code) {
     $('#roomMenu-'+code).attr('sp', $(window).scrollTop())
   }
+});
+
+$(document).ready(() => {
+  $(window).focus(function() {
+    // $('meta[name=tabActive]').attr('content', "true")
+  });
+
+  $(window).blur(function() {
+    // $('meta[name=tabActive]').attr('content', "false")
+  });
+
+  cacheDB.runCache()
 })

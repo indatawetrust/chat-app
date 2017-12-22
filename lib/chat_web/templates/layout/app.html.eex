@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="id" content="<%= @id %>">
+    <meta name="tabActive" content="">
     <title>Talktotalk.me</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
@@ -21,7 +22,7 @@
             <li class="active usersTab"><a data-toggle="tab" href="#home">users</a></li>
           </ul>
         </div>
-        <div class="form-group">
+        <div class="form-group" style="height:20px">
           <input maxlength="1000" type="text" class="form-control" id="msg" placeholder="message.." autofocus disabled>
         </div>
       </div>
