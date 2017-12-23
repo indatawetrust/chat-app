@@ -150,7 +150,7 @@ const fn = {
                 <img code="<%= user.code %>" src="https://www.ocf.berkeley.edu/~dblab/blog/wp-content/uploads/2012/01/icon-profile.png" class="userPic img-circle" style="width:30px">
               </div>
               <div style="float:left;width:90%">
-                <div style="padding:0 4px 4px 4px">
+                <div style="padding:0 4px 4px 4px;word-wrap: break-word;">
                   ${decodeURIComponent(message.body.autoLink({ target: "_blank", rel: "nofollow" }))}
                 </div>
                 <div style="font-size:11px" class="time" date="${message.time}">

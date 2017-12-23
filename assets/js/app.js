@@ -3,16 +3,7 @@ import "autolink-js"
 const {Howl} = require('howler');
 import {Socket} from "phoenix"
 import cacheDB from "./database"
-
-(function($) {
-	$.sanitize = function(input) {
-		var output = input.replace(/<script[^>]*?>.*?<\/script>/gi, '').
-					 replace(/<[\/\!]*?[^<>]*?>/gi, '').
-					 replace(/<style[^>]*?>.*?<\/style>/gi, '').
-					 replace(/<![\s\S]*?--[ \t\n\r]*>/gi, '');
-	    return output;
-	};
-})(jQuery);
+import xss from "xss"
 
 const sound = new Howl({
   src: ['sound/notification.mp3']
@@ -105,7 +96,7 @@ channel.on("new_msg", payload => {
   let active = $('.nav-tabs .active').attr('code')
 
   if (payload.type == 'message') {
-    message = $.sanitize(message)
+    message = xss(message, { stripIgnoreTag: true })
 
     $('#roomMenu-'+code).attr('sp', 0)
 
@@ -273,7 +264,7 @@ $('#msg').on('keyup', e => {
   let message = $(e.target).val()
   const active = $('.nav-tabs .active').attr('code')
 
-  message = $.sanitize(message)
+  message = xss(message, { stripIgnoreTag: true })
 
   $('#roomMenu-'+code).attr('input-text', message)
 
@@ -285,7 +276,7 @@ $('#msg').on('keydown', e => {
   let message = $(e.target).val()
   const me = $('meta[name=id]').attr('content')
 
-  message = $.sanitize(message)
+  message = xss(message, { stripIgnoreTag: true })
 
   if (e.keyCode == 13 && message.trim().length) {
     $('.messages-'+code).prepend(`
