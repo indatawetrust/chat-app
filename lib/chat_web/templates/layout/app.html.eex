@@ -8,14 +8,17 @@
     <meta name="author" content="">
     <meta name="id" content="<%= @id %>">
     <meta name="tabActive" content="">
-    <title>Talktotalk.me</title>
+    <title>Talktotalk.me | How about a chat?</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
   <body>
     <div class="">
-      <div style="position:fixed;z-index: 999;width: 100%;background-color: #fff;top: 0;">
+      <div style="position:fixed;z-index: 999;width: 100%;background-color: #fff;top: 0;padding:5px 0">
         <div class="" style="padding:5px;font-size:20px">
           Talktotalk<sup style="font-size:12px"> beta</sup>
+          <a target="_blank" style="display:inline-block" href="https://www.facebook.com/sharer.php?u=https://talktotalk.me/<%= @id %>"><i style="margin-left:20px" class="fa fa-facebook" aria-hidden="true"></i></a>
+          <a target="_blank" style="display:inline-block" href="https://twitter.com/intent/tweet?url=https://talktotalk.me/<%= @id %>&text=How about a chat?&hashtags=talktotalk"><i style="margin-left:10px" class=" fa fa-twitter" aria-hidden="true"></i></a>
         </div>
         <div style="width:100%;overflow-y:scroll;height:69px;margin-top:-20px">
           <ul class="nav nav-tabs userTabs">
@@ -51,10 +54,12 @@
 
       gtag('config', 'UA-111278853-1');
     </script>
+    <script>
+      var USER=<%= @currentUser |> raw %>;
+    </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.4/moment.min.js"></script>
-    <script src="https://unpkg.com/tahta@1.0.2/index.js"></script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>

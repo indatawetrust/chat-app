@@ -18,6 +18,7 @@ defmodule ChatWeb.Router do
 
     get "/", PageController, :index
     get "/users", PageController, :users
+    get "/:username", PageController, :index
   end
 
   # Other scopes may use custom stacks.

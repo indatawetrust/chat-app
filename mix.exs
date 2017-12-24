@@ -20,7 +20,7 @@ defmodule Chat.Mixfile do
   def application do
     [
       mod: {Chat.Application, []},
-      extra_applications: [:logger, :runtime_tools, :hashids, :redix]
+      extra_applications: [:logger, :runtime_tools, :hashids, :redix, :browser]
     ]
   end
 
@@ -42,7 +42,8 @@ defmodule Chat.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:hashids, "~> 2.0"},
-      {:redix, ">= 0.0.0"}
+      {:redix, ">= 0.0.0"},
+      {:browser, "~> 0.1.0"}
     ]
   end
 

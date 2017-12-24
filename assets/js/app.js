@@ -1,9 +1,11 @@
 import "phoenix_html"
 import "autolink-js"
+
 const {Howl} = require('howler');
 import {Socket} from "phoenix"
 import cacheDB from "./database"
 import xss from "xss"
+import Noty from 'noty';
 
 const sound = new Howl({
   src: ['sound/notification.mp3']
@@ -276,7 +278,7 @@ $('#msg').on('keydown', e => {
   let message = $(e.target).val()
   const me = $('meta[name=id]').attr('content')
 
-  message = xss(message, { stripIgnoreTag: true })
+  message = xss(message, { stripIgnoreTag: true });
 
   if (e.keyCode == 13 && message.trim().length) {
     $('.messages-'+code).prepend(`
@@ -295,9 +297,9 @@ $('#msg').on('keydown', e => {
           </div>
         </div>
       </li>
-    `)
+    `);
 
-    channel.push("new_msg", {id: code, me: $('meta[name=id]').attr('content'), msg: message, type: 'message'})
+    channel.push("new_msg", {id: code, me: $('meta[name=id]').attr('content'), msg: message, type: 'message'});
 
     cacheDB.createMessage({
       room: code,
@@ -305,9 +307,11 @@ $('#msg').on('keydown', e => {
       time: new Date(),
       body: message,
       type: "message"
-    })
+    });
 
-    $(e.target).val('')
+    $(e.target).val('');
+
+    $(window).scrollTop(0);
   }
 })
 
@@ -353,4 +357,84 @@ $(document).ready(() => {
   });
 
   cacheDB.runCache()
+
+  if (USER) {
+
+    const {code} = USER
+
+    if ($('#menu-'+code).length) {
+      $('#roomMenu-'+code).tab('show')
+
+      $('#menu-'+code).addClass('active in')
+      $('#home').removeClass('active in')
+    } else {
+      const tabDiv = '<div id="menu-'+code+'" class="tab-pane fade">'+
+                      '<ul class="list-group messages-'+code+'">'+
+                      // '  <li class="list-group-item userLi">...</li>'+
+                      '</ul>'
+                      '</div>'
+
+      const tabMenu = '<li code="'+code+'" id="roomMenu-'+code+'" room="1"><a code="'+code+'" data-toggle="tab" href="#menu-'+code+'">'+code+' <span id="notify-'+code+'" style="font-weight:bold"></span> <button id="closeRoom-'+code+'" style="border-radius:50%">x</button></a></li>'
+
+      $('.nav-tabs').append(tabMenu)
+      $('.tab-content').append(tabDiv)
+
+      $('#closeRoom-'+code).on('click', e => {
+        $('#roomMenu-'+code).remove()
+        $('#menu-'+code).remove()
+        $('.usersTab').tab('show')
+        $('#home').addClass('active in')
+        $('#msg').attr('disabled', 'disabled')
+
+        if ("ga" in window) {
+          var tracker = ga.getAll()[0];
+          if (tracker)
+            tracker.send('event', 'closeUserTab', code);
+        }
+
+        tabWidthUpdate();
+
+        cacheDB.removeRoom(code);
+      })
+
+      $('#roomMenu-'+code).tab('show')
+      $('#menu-'+code).addClass('active in')
+      $('#home').removeClass('active in')
+
+      cacheDB.createRoom(code)
+
+      tabWidthUpdate();
+    }
+
+    new Noty({
+      type: 'success',
+      text: 'Chat was initiated',
+      layout: 'topCenter',
+      theme: 'relax',
+      animation: {
+        open: 'animated fadeIn',
+        close: 'animated fadeOut'
+      },
+      timeout: 500
+    }).show();
+
+    $('#msg').removeAttr('disabled');
+    $('#msg').focus();
+
+  } else if (!USER && window.location.pathname != '/') {
+
+    new Noty({
+      type: 'success',
+      text: 'User not found',
+      layout: 'topCenter',
+      theme: 'relax',
+      animation: {
+        open: 'animated fadeIn',
+        close: 'animated fadeOut'
+      },
+      timeout: 500
+    }).show();
+
+  }
+
 })

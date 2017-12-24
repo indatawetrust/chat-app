@@ -3,6 +3,7 @@ defmodule Chat.User do
   import Ecto.Changeset
   alias Chat.User
 
+  @derive {Poison.Encoder, only: [:code]}
 
   schema "users" do
     field :code, :string
