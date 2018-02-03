@@ -35,7 +35,7 @@
           <ul class="list-group usersUl">
             <%= for user <- @users do %>
               <li class="list-group-item userLi" code="<%= user[:code] %>" style="cursor:pointer">
-                <img code="<%= user[:code] %>" src="https://www.ocf.berkeley.edu/~dblab/blog/wp-content/uploads/2012/01/icon-profile.png" class="userPic img-circle" style="width:30px;height:auto"> <%= user[:code] %>
+                <img code="<%= user[:code] %>" src="/images/profile.png" class="userPic img-circle" style="width:30px;height:auto"> <%= user[:code] %>
               </li>
             <% end %>
           </ul>

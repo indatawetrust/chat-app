@@ -6,6 +6,27 @@ import {Socket} from "phoenix"
 import cacheDB from "./database"
 import xss from "xss"
 import Noty from 'noty';
+import mitt from 'mitt'
+
+const emitter = mitt()
+
+const onFocus = () => {
+  emitter.emit('isPageActiveOn', true)
+}
+
+$(window).focus(function() {
+  emitter.off('isPageActiveEmit', onFocus)
+  emitter.on('isPageActiveEmit', onFocus)
+});
+
+const onBlur = () => {
+  emitter.emit('isPageActiveOn', false)
+}
+
+$(window).blur(function() {
+  emitter.off('isPageActiveEmit', onBlur)
+  emitter.on('isPageActiveEmit', onBlur)
+});
 
 const sound = new Howl({
   src: ['sound/notification.mp3']
@@ -92,10 +113,20 @@ const tabClick = () => {
   }
 }
 
+const onEvent = is => {
+  if (!is) {
+    sound.play();
+  }
+}
+
 channel.on("new_msg", payload => {
   const code = payload.user
   let message = payload.body
   let active = $('.nav-tabs .active').attr('code')
+
+  emitter.emit('isPageActiveEmit')
+  emitter.off('isPageActiveOn', onEvent)
+  emitter.on('isPageActiveOn', onEvent)
 
   if (payload.type == 'message') {
     message = xss(message, { stripIgnoreTag: true })
@@ -161,7 +192,7 @@ channel.on("new_msg", payload => {
       <li class="list-group-item" style="background-color:#fff">
         <div class="row" style="padding:4px">
           <div style="float:left;">
-            <img code="<%= user.code %>" src="https://www.ocf.berkeley.edu/~dblab/blog/wp-content/uploads/2012/01/icon-profile.png" class="userPic img-circle" style="width:30px">
+            <img code="<%= user.code %>" src="/images/profile.png" class="userPic img-circle" style="width:30px">
           </div>
           <div style="float:left;width:90%">
             <div style="padding:0 4px 4px 4px">
@@ -285,7 +316,7 @@ $('#msg').on('keydown', e => {
       <li class="list-group-item" style="background-color:#ecf0f1">
         <div class="row" style="padding:4px">
           <div style="float:left;">
-            <img code="<%= user.code %>" src="https://www.ocf.berkeley.edu/~dblab/blog/wp-content/uploads/2012/01/icon-profile.png" class="userPic img-circle" style="width:30px">
+            <img code="<%= user.code %>" src="/images/profile.png" class="userPic img-circle" style="width:30px">
           </div>
           <div style="float:left;width:90%">
             <div style="padding:0 4px 4px 4px">
@@ -322,7 +353,7 @@ $('.shuffle').click(() => {
     for (let user of users) {
       $('.usersUl').append(`
         <li class="list-group-item userLi" code="${user.code}" style="cursor:pointer">
-          <img code="${user.code}" src="https://www.ocf.berkeley.edu/~dblab/blog/wp-content/uploads/2012/01/icon-profile.png" class="userPic img-circle" style="width:30px;height:auto"> ${user.code}
+          <img code="${user.code}" src="/images/profile.png" class="userPic img-circle" style="width:30px;height:auto"> ${user.code}
         </li>
       `)
     }
@@ -348,13 +379,6 @@ $(window).scroll(e => {
 });
 
 $(document).ready(() => {
-  $(window).focus(function() {
-    // $('meta[name=tabActive]').attr('content', "true")
-  });
-
-  $(window).blur(function() {
-    // $('meta[name=tabActive]').attr('content', "false")
-  });
 
   cacheDB.runCache()
 
