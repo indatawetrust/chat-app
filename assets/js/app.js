@@ -1,5 +1,6 @@
 import "phoenix_html"
 import "autolink-js"
+import mediumZoom from 'medium-zoom'
 
 const {Howl} = require('howler');
 import {Socket} from "phoenix"
@@ -7,6 +8,10 @@ import cacheDB from "./database"
 import xss from "xss"
 import Noty from 'noty';
 import mitt from 'mitt'
+
+const callbackAutoLink = (url) => {
+  return /\.(gif|png|jpe?g)$/i.test(url) ? '<img id="photo" style="width:150px;height:auto" src="' + url + '">' : null;
+}
 
 const emitter = mitt()
 
@@ -196,7 +201,7 @@ channel.on("new_msg", payload => {
           </div>
           <div style="float:left;width:90%">
             <div style="padding:0 4px 4px 4px">
-              ${decodeURIComponent(message.autoLink({ target: "_blank", rel: "nofollow" }))}
+              ${decodeURIComponent(message.autoLink({ target: "_blank", rel: "nofollow", callback: callbackAutoLink }))}
             </div>
             <div style="font-size:11px" class="time" date="${Date()}">
               ${moment().fromNow()}
@@ -320,7 +325,7 @@ $('#msg').on('keydown', e => {
           </div>
           <div style="float:left;width:90%">
             <div style="padding:0 4px 4px 4px">
-              ${decodeURIComponent(message.autoLink({ target: "_blank", rel: "nofollow" }))}
+              ${decodeURIComponent(message.autoLink({ target: "_blank", rel: "nofollow", callback: callbackAutoLink }))}
             </div>
             <div style="font-size:11px" class="time" date="${Date()}">
               ${moment().fromNow()}
@@ -329,7 +334,7 @@ $('#msg').on('keydown', e => {
         </div>
       </li>
     `);
-
+    
     channel.push("new_msg", {id: code, me: $('meta[name=id]').attr('content'), msg: message, type: 'message'});
 
     cacheDB.createMessage({

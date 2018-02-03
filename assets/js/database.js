@@ -1,6 +1,11 @@
 import "autolink-js"
 const localStorageDB = require('localstoragedb');
 const lib = new localStorageDB("database", localStorage);
+import mediumZoom from 'medium-zoom'
+
+const callbackAutoLink = (url) => {
+  return /\.(gif|png|jpe?g)$/i.test(url) ? '<img id="photo" style="width:150px;height:auto;z-index:999999" src="' + url + '">' : null;
+}
 
 if (!lib.tableExists('rooms')) {
   lib.createTable("rooms", ["code"]);
@@ -151,7 +156,7 @@ const fn = {
               </div>
               <div style="float:left;width:90%">
                 <div style="padding:0 4px 4px 4px;word-wrap: break-word;">
-                  ${decodeURIComponent(message.body.autoLink({ target: "_blank", rel: "nofollow" }))}
+                  ${decodeURIComponent(message.body.autoLink({ target: "_blank", rel: "nofollow", callback: callbackAutoLink }))}
                 </div>
                 <div style="font-size:11px" class="time" date="${message.time}">
                   ${moment(message.time).fromNow()}
@@ -165,6 +170,8 @@ const fn = {
 
     tabWidthUpdate()
     tabClick()
+
+    mediumZoom('#photo')
   }
 }
 
