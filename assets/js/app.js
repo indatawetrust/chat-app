@@ -220,6 +220,8 @@ channel.on("new_msg", payload => {
     })
 
     tabWidthUpdate()
+
+    mediumZoom('#photo')
   }
 
 })
@@ -334,7 +336,7 @@ $('#msg').on('keydown', e => {
         </div>
       </li>
     `);
-    
+
     channel.push("new_msg", {id: code, me: $('meta[name=id]').attr('content'), msg: message, type: 'message'});
 
     cacheDB.createMessage({
@@ -348,6 +350,8 @@ $('#msg').on('keydown', e => {
     $(e.target).val('');
 
     $(window).scrollTop(0);
+
+    mediumZoom('#photo')
   }
 })
 
